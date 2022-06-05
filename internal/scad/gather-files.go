@@ -14,7 +14,9 @@ type File struct {
 	Filename string
 }
 
-func NewFile(filePath string) *File {
+type Files []*File
+
+func newFile(filePath string) *File {
 	dir, file := path.Split(filePath)
 	filename := strings.TrimSuffix(file, path.Ext(file))
 
@@ -27,7 +29,7 @@ func NewFile(filePath string) *File {
 	return fileStruct
 }
 
-func FilterFiles(files []*File, filterFn func(f *File) (bool, error)) (filtered []*File, err error) {
+func (files Files) Filter(filterFn func(f *File) (bool, error)) (filtered Files, err error) {
 
 	for _, f := range files {
 		keep, err := filterFn(f)
@@ -43,7 +45,7 @@ func FilterFiles(files []*File, filterFn func(f *File) (bool, error)) (filtered 
 	return filtered, nil
 }
 
-func GatherScadFiles(scanDir string) (files []*File, err error) {
+func GatherFiles(scanDir string) (files Files, err error) {
 	if scanDir == "" {
 		scanDir = config.ExecDir
 	}
@@ -60,7 +62,7 @@ func GatherScadFiles(scanDir string) (files []*File, err error) {
 			}
 
 			if path.Ext(info.Name()) == ".scad" && !strings.HasPrefix(info.Name(), "lib_") {
-				files = append(files, NewFile(fp))
+				files = append(files, newFile(fp))
 			}
 			return nil
 		},

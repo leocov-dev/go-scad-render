@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -42,16 +43,21 @@ func run(cmd *cobra.Command, args []string) {
 	scanDirectory := filepath.Clean(args[0])
 
 	s := spinners.StartNewSpinner(fmt.Sprintf("Scanning for OpenScad files in: %s...", config.ExecDir))
-	files, err := scad.GatherScadFiles(scanDirectory)
+	files, err := scad.GatherFiles(scanDirectory)
 	if err != nil {
 		utils.CmdFailed(cmd, err)
 	}
 	s.Stop()
 
-	// Maybe only render when no existing png file
-	filtered, err := scad.FilterFiles(files, func(f *scad.File) (bool, error) {
+	// Only render when no existing png file
+	filtered, err := files.Filter(func(f *scad.File) (bool, error) {
 		imagePath := fmt.Sprintf("%s%s.png", f.Dir, f.Filename)
 		return !utils.FileExists(imagePath), nil
+	})
+
+	// Skip files in "lib_" prefix
+	filtered, err = filtered.Filter(func(f *scad.File) (bool, error) {
+		return !strings.HasPrefix(f.Filename, "lib_"), nil
 	})
 
 	count := len(filtered)
