@@ -1,9 +1,9 @@
 // Package concurrent_tasks
 //
 // Inspired by:
-//   Giuseppe Malavolta
-//   https://medium.com/@zufolo/a-pattern-for-limiting-the-number-of-goroutines-in-execution-56e13b226e72
 //
+//	Giuseppe Malavolta
+//	https://medium.com/@zufolo/a-pattern-for-limiting-the-number-of-goroutines-in-execution-56e13b226e72
 package concurrent_tasks
 
 import (
